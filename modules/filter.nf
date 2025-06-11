@@ -2,13 +2,12 @@ process FILTER {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/filtered", mode: 'copy')
 
     input:
-    tuple val(key), path(cnv), path(cnv_log)
+    tuple val(key), val(type), path(cnv), path(cnv_log)
 
     output:
     tuple val(key), path("${key}.filtered.cnv")

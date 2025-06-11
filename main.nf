@@ -2,99 +2,25 @@
 
 nextflow.enable.dsl=2
 
-include { PFB } from './modules/pfb.nf'
-include { GCM } from './modules/gcm.nf'
+include { prepare_references }  from './subworkflows/prepare_references.nf'
+include { call_alternates }     from './subworkflows/call_alternates.nf'
+include { clean_cnv }           from './subworkflows/clean_cnv.nf'
+include { assess_quality }      from './subworkflows/assess_quality.nf'
 
-include { EXTRACT } from './modules/extract.nf'
-include { ADJUST } from './modules/adjust.nf'
-include { DETECT } from './modules/detect.nf'
+dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
+snplist = Channel.fromPath(params.snplist)
+gcm     = Channel.fromPath(params.gc)
+gtc     = Channel.fromPath(params.gtc) | map { [ it.simpleName, it ] }
+hmm     = Channel.fromPath(params.hmm)
+genes   = Channel.fromPath(params.refgene)
+links   = Channel.fromPath(params.reflink)
 
-include { FILTER } from './modules/filter.nf'
-include { CLEAN } from './modules/clean.nf'
-include { SCAN } from './modules/scan.nf'
-include { VISUALIZE } from './modules/visualize.nf'
-
-include { ASSESS } from './modules/assess.nf'
-
-workflow REFERENCES {
-    // Compile refernce files
-    Channel.fromPath(params.hmm) | set { hmm }
-    Channel.fromPath(params.refgene) | set { genes }
-    Channel.fromPath(params.reflink) | set { links }
-
-    Channel.fromFilePairs(params.dbsnp, flat: true) | set { dbsnp }
-    Channel.fromPath(params.snplist) | set { snplist }
-    Channel.fromPath(params.gc) | set { gcm }
-    
-    dbsnp 
-        | combine(snplist) 
-        | PFB 
-        | combine(gcm) 
-        | GCM
-        | combine(PFB.out, by: 0)
-        | combine(hmm)
-        | combine(genes)
-        | combine(links)
-        | map { [dbsnp: it[0], gcm: it[1], txt: it[2], pfb: it[3], hmm: it[4], genes: it[5], links: it[6]] }
-        | set {ref}
-    // ref | view
-    emit:
-    ref
-}
-
-Channel.fromPath(params.gtc) 
-    | map { [it.simpleName, it] }
-    | set { gtc }
-
-workflow CALLING {
-    take: 
-    gtc
-    ref
-
-    main:
-    gtc
-        | EXTRACT 
-        // | combine(ref.map { it.gcm })
-        // | ADJUST
-        | combine(ref.map { it.pfb })
-        | combine(ref.map { it.hmm })
-        | combine(Channel.of( 'cnv' ))
-        | DETECT
-        | FILTER
-        | combine(ref.map { it.pfb })
-        | CLEAN
-        | map { ['scanned', it.last()] }
-        | groupTuple(by: 0)
-        | combine(ref.map { it.genes })
-        | combine(ref.map { it.links })
-        | SCAN
-        | combine(Channel.of( 'bed', 'tab'))
-        | VISUALIZE
-    
-    EXTRACT.out
-        | combine(DETECT.out, by: 0)
-        | groupTuple(by: 0)
-        | ASSESS
-
-    emit:
-    EXTRACT.out
-}
-
-workflow LOH {
-    take: 
-    signal
-    ref
-
-    main:
-    signal
-        | combine(ref.map { it.pfb })
-        | combine(ref.map { it.hmm })
-        | combine(Channel.of( 'loh' ))
-        | DETECT
-}
+type_ch   = Channel.of(params.type.split(','))
+format_ch = Channel.of( 'bed', 'tab' )
 
 workflow {
-    REFERENCES()
-    CALLING(gtc, REFERENCES.out)
-    LOH(CALLING.out, REFERENCES.out)
+    ref = prepare_references(dbsnp, snplist, gcm)
+    alt = call_alternates(gtc, ref.pfb, ref.gcm, hmm, genes, links)
+    clean_cnv(alt.cnv, ref.pfb, genes, links)
+    assess_quality(alt.cnv, alt.signal)
 }

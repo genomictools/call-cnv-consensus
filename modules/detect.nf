@@ -2,16 +2,18 @@ process DETECT {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/${type}", mode: 'copy')
 
     input:
-    tuple val(key), path(file), file(pfb), file(hmm), val(type)
+    tuple val(key), path(file), 
+          val(dbspn), val(txt), file(pfb),
+          file(hmm),
+          val(type)
 
     output:
-    tuple val(key), 
+    tuple val(key), val(type),
           path("${key}.${type}"),
           path("${key}.log")
     

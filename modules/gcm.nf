@@ -2,8 +2,7 @@ process GCM {
     tag "${dbsnp}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/ref", mode: 'copy')
 

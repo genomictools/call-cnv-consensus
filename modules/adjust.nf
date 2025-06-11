@@ -2,16 +2,16 @@ process ADJUST {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/adjusted", mode: 'copy')
 
     input:
-    tuple val(key), path(file), file(gcm)
+    tuple val(key), path(file),
+          val(dbsnp), file(gcm)
 
     output:
-    tuple val(key), path("${key}.adjusted.txt")
+    tuple val(key), path("${key}.signal.txt.adjusted")
     
     script:
     """
@@ -20,7 +20,5 @@ process ADJUST {
         -adjust \
         -gcmodel ${gcm} \
         ${file}
-    
-    cp ${key}.adjusted ${key}.adjusted.txt
     """
 }

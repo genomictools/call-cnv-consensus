@@ -2,8 +2,7 @@ process VISUALIZE {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/tables", mode: 'copy')
 

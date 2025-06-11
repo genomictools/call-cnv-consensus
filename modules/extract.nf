@@ -2,8 +2,7 @@ process EXTRACT {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/signal", mode: 'copy')
 

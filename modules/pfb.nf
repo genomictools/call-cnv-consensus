@@ -2,8 +2,7 @@ process PFB {
     tag "${dbsnp}"
 
     label 'simple'
-
-    container = params.bcftools
+    label 'bcftools'
     
     publishDir("${params.output_dir}/ref", mode: 'copy')
 

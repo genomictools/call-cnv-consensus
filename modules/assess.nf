@@ -3,13 +3,12 @@ process ASSESS {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/qc", mode: 'copy')
 
     input:
-    tuple val(key), path(signal), path(cnv), path(cnv_log)
+    tuple val(key), path(signal), val(type), path(cnv), path(cnv_log)
 
     output:
     tuple val(key),

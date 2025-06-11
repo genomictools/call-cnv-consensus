@@ -2,8 +2,7 @@ process SCAN {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/scanned", mode: 'copy')
 

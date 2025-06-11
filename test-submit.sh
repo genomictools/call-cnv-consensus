@@ -21,7 +21,8 @@ module load Nextflow
 # nextflow run houlstonlab/call-cnv-arrays -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile local,gha \
+    -params-file ../test-params.json \
+    -profile cluster \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  

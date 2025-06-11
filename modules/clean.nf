@@ -2,13 +2,13 @@ process CLEAN {
     tag "${key}"
 
     label 'simple'
-
-    container = params.penncnv
+    label 'penncnv'
 
     publishDir("${params.output_dir}/clean", mode: 'copy')
 
     input:
-    tuple val(key), path(cnv), path(pfb)
+    tuple val(key), path(cnv), 
+          val(dbsnp), path(txt), path(pfb)
 
     output:
     tuple val(key), path("${key}.clean.cnv")

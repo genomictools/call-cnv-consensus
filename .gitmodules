@@ -1,0 +1,15 @@
+[submodule "conf"]
+	path = conf
+	url = git@github.com:genomictools/conf.git
+[submodule "bin"]
+	path = bin
+	url = git@github.com:genomictools/bin.git
+	branch = call-cnv-arrays
+[submodule "modules"]
+	path = modules
+	url = git@github.com:genomictools/modules.git
+	branch = call-cnv-arrays
+[submodule "subworkflows"]
+	path = subworkflows
+	url = git@github.com:genomictools/subworkflows.git
+	branch = call-cnv-arrays

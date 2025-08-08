@@ -7,13 +7,14 @@
 #SBATCH -t 120:00:00
 
 # Setup test directory
-mkdir -p test/ test/input
-cd test/
+mkdir -p tests/ tests/input
 
 # # Download test data
 # URL="https://figshare.com/ndownloader/files"
 
 # wget -c $URL/50690370 -O input/pheno.variants.vcf.gz
+
+cd tests/
 
 # Run nextflow
 module load Nextflow

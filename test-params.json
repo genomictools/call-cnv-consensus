@@ -1,7 +1,8 @@
 {
     "gtc"   : "input/gtc/*.gtc.txt",
     "dbsnp" : "input/*.vcf.gz{,.tbi}",
-    "hmm"   : "input/hhall_0.hmm",
+    "hmm"   : "input/hhall.hmm",
+    "hmm0"  : "input/hhall_0.hmm",
     "gc"    : "input/hg38.gc5Base.short.txt",
     "snplist" : "input/snp_list.txt",
     "refgene" : "input/refGene.txt",

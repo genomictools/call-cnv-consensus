@@ -23,7 +23,7 @@ module load Nextflow
 nextflow run ../main.nf \
     --output_dir ./results/ \
     -params-file ../test-params.json \
-    -profile cluster \
+    -profile local \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  

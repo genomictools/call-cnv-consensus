@@ -19,8 +19,9 @@ hmm0    = Channel.fromPath(params.hmm0)
 genes   = Channel.fromPath(params.refgene)
 links   = Channel.fromPath(params.reflink)
 
-type_ch   = Channel.of(params.type.split(','))
-format_ch = Channel.of( 'bed', 'tab' )
+type_ch     = Channel.of(params.type.split(','))
+format_ch   = Channel.of( 'bed', 'tab' )
+features_ch = Channel.of( 'gene', 'exon', 'none')
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)

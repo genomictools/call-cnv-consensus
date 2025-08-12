@@ -21,7 +21,7 @@ links   = Channel.fromPath(params.reflink)
 
 type_ch     = Channel.of(params.type.split(','))
 format_ch   = Channel.of( 'bed', 'tab' )
-features_ch = Channel.of( 'gene', 'exon', 'none')
+features_ch = Channel.of(params.features.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)

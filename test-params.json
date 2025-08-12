@@ -5,6 +5,5 @@
     "gc"      : "input/hg38.gc5Base.short.txt",
     "snplist" : "input/snp_list.txt",
     "refgene" : "input/refGene.txt",
-    "reflink" : "input/refLink.txt",
-    "adjust"  : false
+    "reflink" : "input/refLink.txt"
 }

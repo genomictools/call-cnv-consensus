@@ -27,5 +27,7 @@ workflow {
     ref = prepare_references(dbsnp, snplist, gc)
     alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0, genes, links)
     clean_cnv(alt.cnv, ref.pfb, genes, links)
-    assess_quality(alt.cnv, alt.signal)
+    if ( params.qc ) {
+        assess_quality(alt.cnv, alt.signal)
+    }
 }

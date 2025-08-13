@@ -21,9 +21,10 @@ links   = Channel.fromPath(params.reflink)
 type_ch     = Channel.of(params.type.split(','))
 format_ch   = Channel.of(params.format.split(','))
 features_ch = Channel.of(params.features.split(','))
+plot_type_ch= Channel.of(params.plot_type.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)
     alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0)
-    visualize_cnv(alt.cnv, genes, links)
+    visualize_cnv(alt.cnv, genes, links, alt.signal, ref.pfb)
 }

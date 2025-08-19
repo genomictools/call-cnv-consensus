@@ -17,6 +17,7 @@ hmm     = Channel.fromPath(params.hmm)
 hmm0    = Channel.fromPath(params.hmm0)
 genes   = Channel.fromPath(params.refgene)
 links   = Channel.fromPath(params.reflink)
+exclude = Channel.fromPath(params.exclude_regions)
 
 type_ch     = Channel.of(params.type.split(','))
 format_ch   = Channel.of(params.format.split(','))
@@ -25,6 +26,6 @@ plot_type_ch= Channel.of(params.plot_type.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)
-    alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0)
+    alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0, exclude)
     visualize_cnv(alt.cnv, genes, links, alt.signal, ref.pfb)
 }

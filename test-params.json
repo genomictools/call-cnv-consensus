@@ -5,5 +5,6 @@
     "gc"      : "input/hg38.gc5Base.short.txt",
     "snplist" : "input/snp_list.txt",
     "refgene" : "input/refGene.txt",
-    "reflink" : "input/refLink.txt"
+    "reflink" : "input/refLink.txt",
+    "exclude_regions" : "tests/input/hg38.exclude.txt"
 }

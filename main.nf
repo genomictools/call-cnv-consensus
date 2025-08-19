@@ -4,6 +4,7 @@ nextflow.enable.dsl=2
 
 include { prepare_references }  from './subworkflows/prepare_references.nf'
 include { call_alternates }     from './subworkflows/call_alternates.nf'
+include { clean_calls }         from './subworkflows/clean_calls.nf'
 include { visualize_cnv }       from './subworkflows/visualize_cnv.nf'
 
 gtc_ch = Channel.fromPath(params.cohorts)
@@ -26,6 +27,7 @@ plot_type_ch= Channel.of(params.plot_type.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)
-    alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0, exclude)
-    visualize_cnv(alt.cnv, genes, links, alt.signal, ref.pfb)
+    alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm, hmm0)
+    cleaned = clean_calls(alt.cnv, ref.pfb, exclude)
+    visualize_cnv(cleaned.cnv, genes, links, alt.signal, ref.pfb)
 }

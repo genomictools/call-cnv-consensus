@@ -24,6 +24,10 @@ hmm     = Channel.empty()
     | ( params.hmm0 != null ? concat(Channel.of(['loh', file(params.hmm0)])) : Channel.empty() )
     | combine(type_ch, by: 0)
 
+genelist_ch = Channel.empty()
+    | ( params.genelist != null ? concat(Channel.of(file(params.genelist))) : Channel.empty() )
+    | splitCsv(header: true)
+    | map { row -> [ row.cohort, row.gene ] }
 
 format_ch   = Channel.of(params.format.split(','))
 features_ch = Channel.of(params.features.split(','))
@@ -32,5 +36,5 @@ workflow {
     ref = prepare_references(dbsnp, snplist, gc)
     alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm)
     cleaned = clean_calls(alt.calls, ref.pfb, exclude)
-    visualize_cnv(cleaned.calls, ref.pfb, alt.signal, genes, links)
+    visualize_cnv(cleaned.calls, ref.pfb, alt.signal, genes, links, genelist_ch)
 }

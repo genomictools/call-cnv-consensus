@@ -27,7 +27,6 @@ hmm     = Channel.empty()
 
 format_ch   = Channel.of(params.format.split(','))
 features_ch = Channel.of(params.features.split(','))
-plot_type_ch= Channel.of(params.plot_type.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc)

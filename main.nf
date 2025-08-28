@@ -3,6 +3,7 @@
 nextflow.enable.dsl=2
 
 include { prepare_references }  from './subworkflows/prepare_references.nf'
+include { prepare_signal }      from './subworkflows/prepare_signal.nf'
 include { call_alternates }     from './subworkflows/call_alternates.nf'
 include { clean_calls }         from './subworkflows/clean_calls.nf'
 include { visualize_cnv }       from './subworkflows/visualize_cnv.nf'
@@ -18,11 +19,10 @@ genes   = Channel.fromPath(params.refgene)
 links   = Channel.fromPath(params.reflink)
 exclude = Channel.fromPath(params.exclude_regions)
 
-type_ch = Channel.of(params.type.split(','))
 hmm     = Channel.empty()
-    | ( params.hmm  != null ? concat(Channel.of(['cnv', file(params.hmm)]))  : Channel.empty() )
-    | ( params.hmm0 != null ? concat(Channel.of(['loh', file(params.hmm0)])) : Channel.empty() )
-    | combine(type_ch, by: 0)
+    | ( params.hmm  != null ? concat(Channel.of([file(params.hmm), 'cnv']))  : Channel.empty() )
+    | ( params.hmm0 != null ? concat(Channel.of([file(params.hmm0), 'loh'])) : Channel.empty() )
+    // | combine(type_ch, by: 0)
 
 genelist_ch = Channel.empty()
     | ( params.genelist != null ? concat(Channel.of(file(params.genelist))) : Channel.empty() )
@@ -32,9 +32,13 @@ genelist_ch = Channel.empty()
 format_ch   = Channel.of(params.format.split(','))
 features_ch = Channel.of(params.features.split(','))
 
+type_ch = Channel.of(params.type.split(','))
+tools_ch = Channel.of(params.tools.split(','))
+
 workflow {
-    ref = prepare_references(dbsnp, snplist, gc)
-    alt = call_alternates(gtc_ch, ref.pfb, ref.gcm, hmm)
-    cleaned = clean_calls(alt.calls, ref.pfb, exclude)
-    visualize_cnv(cleaned.calls, ref.pfb, alt.signal, genes, links, genelist_ch)
+    ref = prepare_references(dbsnp, snplist, gc, tools_ch)
+    signal = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
+    alt = call_alternates(signal, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
+    cleaned = clean_calls(alt, ref.pfb, exclude)
+    visualize_cnv(cleaned.calls, ref.pfb, signal, genes, links, genelist_ch)
 }

@@ -37,8 +37,8 @@ tools_ch = Channel.of(params.tools.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc, tools_ch)
-    signal = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
-    alt = call_alternates(signal, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
+    input = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
+    alt = call_alternates(input.signal, input.genotype, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     cleaned = clean_calls(alt, ref.pfb, exclude)
-    visualize_cnv(cleaned.calls, ref.pfb, signal, genes, links, genelist_ch)
+    visualize_cnv(cleaned.calls, ref.pfb, input.signal, genes, links, genelist_ch)
 }

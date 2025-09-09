@@ -6,11 +6,17 @@ include { prepare_references }  from './subworkflows/prepare_references.nf'
 include { prepare_signal }      from './subworkflows/prepare_signal.nf'
 include { call_alternates }     from './subworkflows/call_alternates.nf'
 include { clean_calls }         from './subworkflows/clean_calls.nf'
+include { test_calls }          from './subworkflows/test_calls.nf'
 include { visualize_cnv }       from './subworkflows/visualize_cnv.nf'
 
 gtc_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
     | map { row -> [ row.cohort, row.key, file(row.file) ] }
+
+pedigree_ch = Channel.fromPath(params.cohorts)
+    | splitCsv(header: true, sep: ',')
+    | map { row -> [ row.cohort, file(row.pedigree) ] }
+    | unique
 
 dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
 snplist = Channel.fromPath(params.snplist)
@@ -34,11 +40,13 @@ features_ch = Channel.of(params.features.split(','))
 
 type_ch = Channel.of(params.type.split(','))
 tools_ch = Channel.of(params.tools.split(','))
+tests_ch = Channel.of(params.tests.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc, tools_ch)
     input = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
     alt = call_alternates(input.signal, input.genotype, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     cleaned = clean_calls(alt, ref.pfb, exclude)
+    tested = test_calls(input.signal, alt, pedigree_ch, ref.pfb, hmm, tests_ch)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal, genes, links, genelist_ch)
 }

@@ -13,6 +13,11 @@ gtc_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
     | map { row -> [ row.cohort, row.key, file(row.file) ] }
 
+gtc_ch
+    | groupTuple(by: 0)
+    | map { it -> [ it[0], it[1].size() + 1 ] } // TODO: remove when not testing
+    | set { cohort_size }
+
 pedigree_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
     | map { row -> [ row.cohort, file(row.pedigree) ] }
@@ -46,7 +51,7 @@ workflow {
     ref = prepare_references(dbsnp, snplist, gc, tools_ch)
     input = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
     alt = call_alternates(input.signal, input.genotype, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
-    cleaned = clean_calls(alt, ref.pfb, exclude)
-    tested = test_calls(input.signal, alt, pedigree_ch, ref.pfb, hmm, tests_ch)
+    cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
+    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm, tests_ch)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal, genes, links, genelist_ch)
 }

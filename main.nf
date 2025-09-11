@@ -11,7 +11,7 @@ include { visualize_cnv }       from './subworkflows/visualize_cnv.nf'
 
 gtc_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
-    | map { row -> [ row.cohort, row.key, file(row.file) ] }
+    | map { row -> [ row.cohort, row.key, row.level, file(row.file) ] }
 
 gtc_ch
     | groupTuple(by: 0)

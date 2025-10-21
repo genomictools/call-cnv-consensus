@@ -7,23 +7,25 @@
 #SBATCH -t 120:00:00
 
 # Setup test directory
-mkdir -p tests/ tests/input
+mkdir -p tests/
 
-# # Download test data
-# URL="https://figshare.com/ndownloader/files"
+TESTDATA="git@github.com:genomictools/test-datasets.git"
+BRANCH="call-cnv-consensus"
+SRC="tests/input"
 
-# wget -c $URL/50690370 -O input/pheno.variants.vcf.gz
-
-cd tests/
+git -C $SRC pull || \
+git clone -b $BRANCH $TESTDATA $SRC
 
 # Run nextflow
 module load Nextflow
 
-# nextflow run houlstonlab/call-cnv-arrays -r main \
+cd tests/
+
+# nextflow run houlstonlab/call-cnv-consensus -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
+    -profile local,test \
     -params-file ../test-params.json \
-    -profile local,test_penncnv \
     -resume
 
 # usage: nextflow run [ local_dir/main.nf | git_url ]  
@@ -32,5 +34,3 @@ nextflow run ../main.nf \
 #     -profile      {local,cluster} to run using differens resources
 #     -params-file  params.json to pass parameters to the pipeline
 #     -resume       To resume the pipeline from the last checkpoint
-
-mv .nextflow.log nextflow.log

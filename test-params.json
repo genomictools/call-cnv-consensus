@@ -5,6 +5,6 @@
     "gc"      : "input/hg38.gc5base.txt",
     "snplist" : "input/snp_list.txt",
     "refgene" : "input/hg38.refgene.txt",
-    "reflink" : "input/hg38.reflink.txt",
+    "anno"    : "input/hg38.cytoBand.txt",
     "exclude_regions" : "input/hg38.exclude.txt"
 }

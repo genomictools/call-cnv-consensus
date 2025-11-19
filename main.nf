@@ -15,7 +15,7 @@ gtc_ch = Channel.fromPath(params.cohorts)
 
 gtc_ch
     | groupTuple(by: 0)
-    | map { it -> [ it[0], it[1].size() + 1 ] } // TODO: remove when not testing
+    | map { it -> [ it[0], it[1].size() + 1 ] }
     | set { cohort_size }
 
 pedigree_ch = Channel.fromPath(params.cohorts)
@@ -26,8 +26,6 @@ pedigree_ch = Channel.fromPath(params.cohorts)
 dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
 snplist = Channel.fromPath(params.snplist)
 gc      = Channel.fromPath(params.gc)
-genes   = Channel.fromPath(params.refgene)
-links   = Channel.fromPath(params.reflink)
 exclude = Channel.fromPath(params.exclude_regions)
 
 hmm     = Channel.empty()
@@ -41,7 +39,13 @@ genelist_ch = Channel.empty()
     | map { row -> [ row.cohort, row.gene ] }
 
 format_ch   = Channel.of(params.format.split(','))
-features_ch = Channel.of(params.features.split(','))
+features_ch = Channel.from([
+        ['refgene', params.refgene],
+        ['refexon', params.refexon],
+        ['anno', params.anno]
+    ])
+    | filter { it[1] != null }
+    | map { [it[0], file(it[1])] }
 
 type_ch = Channel.of(params.type.split(','))
 tools_ch = Channel.of(params.tools.split(','))
@@ -53,5 +57,5 @@ workflow {
     alt = call_alternates(input.signal, input.genotype, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
     tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm, tests_ch)
-    visualize_cnv(cleaned.calls, ref.pfb, input.signal, genes, links, genelist_ch)
+    visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)
 }

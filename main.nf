@@ -9,11 +9,11 @@ include { clean_calls }         from './subworkflows/clean_calls.nf'
 include { test_calls }          from './subworkflows/test_calls.nf'
 include { visualize_cnv }       from './subworkflows/visualize_cnv.nf'
 
-gtc_ch = Channel.fromPath(params.cohorts)
+signal_ch = Channel.fromPath(params.cohorts)
     | splitCsv(header: true, sep: ',')
     | map { row -> [ row.cohort, row.key, row.level, file(row.file) ] }
 
-gtc_ch
+signal_ch
     | groupTuple(by: 0)
     | map { it -> [ it[0], it[1].size() + 1 ] }
     | set { cohort_size }
@@ -53,8 +53,8 @@ tests_ch = Channel.of(params.tests.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc, tools_ch)
-    input = prepare_signal(gtc_ch, ref.pfb, ref.gcm)
-    alt = call_alternates(input.signal, input.genotype, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
+    input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
+    alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
     tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm, tests_ch)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)

@@ -49,13 +49,12 @@ features_ch = Channel.from([
 
 type_ch = Channel.of(params.type.split(','))
 tools_ch = Channel.of(params.tools.split(','))
-tests_ch = Channel.of(params.tests.split(','))
 
 workflow {
     ref = prepare_references(dbsnp, snplist, gc, tools_ch)
     input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
     alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
-    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm, tests_ch)
+    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)
 }

@@ -54,7 +54,7 @@ workflow {
     if ( params.tools.contains('penncnv') ) {
         ref = prepare_references(params.snplist, params.dbsnp, params.gc)
     }
-    // input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
+    input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
     // alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
     // cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
     // tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm)

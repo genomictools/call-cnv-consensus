@@ -6,5 +6,7 @@
     "snplist" : "input/snp_list.txt",
     "refgene" : "input/hg38.refgene.txt",
     "anno"    : "input/hg38.cytoBand.txt",
-    "exclude_regions" : "input/hg38.exclude.txt"
+    "exclude_regions" : "input/hg38.exclude.txt",
+    "quant_ratios" : "input/quantisnp.levels.dat",
+    "quant_params" : "input/quantisnp.params.dat"
 }

@@ -23,9 +23,9 @@ pedigree_ch = Channel.fromPath(params.cohorts)
     | map { row -> [ row.cohort, file(row.pedigree) ] }
     | unique
 
-dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
-snplist = Channel.fromPath(params.snplist)
-gc      = Channel.fromPath(params.gc)
+// snplist = Channel.fromPath(params.snplist)
+// dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
+// gc      = Channel.fromPath(params.gc)
 exclude = Channel.fromPath(params.exclude_regions)
 
 hmm     = Channel.empty()
@@ -48,13 +48,13 @@ features_ch = Channel.from([
     | map { [it[0], file(it[1])] }
 
 type_ch = Channel.of(params.type.split(','))
-tools_ch = Channel.of(params.tools.split(','))
+// tools_ch = Channel.of(params.tools.split(','))
 
 workflow {
-    ref = prepare_references(dbsnp, snplist, gc, tools_ch)
-    input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
-    alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
-    cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
-    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm)
-    visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)
+    ref = prepare_references(params.snplist, params.dbsnp, params.gc)
+    // input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
+    // alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
+    // cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
+    // tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm)
+    // visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)
 }

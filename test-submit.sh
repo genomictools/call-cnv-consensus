@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH -o test/test.out
-#SBATCH -e test/test.err
+#SBATCH -o tests/test.out
+#SBATCH -e tests/test.err
 #SBATCH -J test
 #SBATCH -p master-worker
 #SBATCH -t 120:00:00
@@ -24,7 +24,7 @@ cd tests/
 # nextflow run houlstonlab/call-cnv-consensus -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile local,test \
+    -profile cluster,test \
     -params-file ../test-params.json \
     -resume
 

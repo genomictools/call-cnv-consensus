@@ -26,35 +26,32 @@ pedigree_ch = Channel.fromPath(params.cohorts)
 // snplist = Channel.fromPath(params.snplist)
 // dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
 // gc      = Channel.fromPath(params.gc)
-exclude = Channel.fromPath(params.exclude_regions)
+// exclude = Channel.fromPath(params.exclude_regions)
 
-hmm     = Channel.empty()
-    | ( params.hmm  != null ? concat(Channel.of([file(params.hmm), 'cnv']))  : Channel.empty() )
-    | ( params.hmm0 != null ? concat(Channel.of([file(params.hmm0), 'loh'])) : Channel.empty() )
+// hmm     = Channel.empty()
+//     | ( params.hmm  != null ? concat(Channel.of([file(params.hmm), 'cnv']))  : Channel.empty() )
+//     | ( params.hmm0 != null ? concat(Channel.of([file(params.hmm0), 'loh'])) : Channel.empty() )
     // | combine(type_ch, by: 0)
 
-genelist_ch = Channel.empty()
-    | ( params.genelist != null ? concat(Channel.of(file(params.genelist))) : Channel.empty() )
-    | splitCsv(header: true)
-    | map { row -> [ row.cohort, row.gene ] }
+// genelist_ch = Channel.empty()
+//     | ( params.genelist != null ? concat(Channel.of(file(params.genelist))) : Channel.empty() )
+//     | splitCsv(header: true)
+//     | map { row -> [ row.cohort, row.gene ] }
 
-format_ch   = Channel.of(params.format.split(','))
-features_ch = Channel.from([
-        ['refgene', params.refgene],
-        ['refexon', params.refexon],
-        ['anno', params.anno]
-    ])
-    | filter { it[1] != null }
-    | map { [it[0], file(it[1])] }
-
-type_ch = Channel.of(params.type.split(','))
-// tools_ch = Channel.of(params.tools.split(','))
+// format_ch   = Channel.of(params.format.split(','))
+// features_ch = Channel.from([
+//         ['refgene', params.refgene],
+//         ['refexon', params.refexon],
+//         ['anno', params.anno]
+//     ])
+//     | filter { it[1] != null }
+//     | map { [it[0], file(it[1])] }
 
 workflow {
     ref   = prepare_references(params.snplist, params.dbsnp, params.gc)
-    // input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
-    // alt = call_alternates(input.signal, input.genotypes, ref.pfb, hmm, ref.levels, type_ch, tools_ch)
-    // cleaned = clean_calls(alt, ref.pfb, exclude, cohort_size)
-    // tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb, hmm)
-    // visualize_cnv(cleaned.calls, ref.pfb, input.signal, features_ch, genelist_ch)
+    input = prepare_signal(signal_ch, ref.pfb, ref.gcm, pedigree_ch)
+    alt = call_alternates(input.signal, input.genotypes, ref.pfb)
+    cleaned = clean_calls(alt, ref.pfb, cohort_size)
+    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb)
+    visualize_cnv(cleaned.calls, ref.pfb, input.signal)
 }

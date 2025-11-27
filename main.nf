@@ -23,35 +23,11 @@ pedigree_ch = Channel.fromPath(params.cohorts)
     | map { row -> [ row.cohort, file(row.pedigree) ] }
     | unique
 
-// snplist = Channel.fromPath(params.snplist)
-// dbsnp   = Channel.fromFilePairs(params.dbsnp, flat: true)
-// gc      = Channel.fromPath(params.gc)
-// exclude = Channel.fromPath(params.exclude_regions)
-
-// hmm     = Channel.empty()
-//     | ( params.hmm  != null ? concat(Channel.of([file(params.hmm), 'cnv']))  : Channel.empty() )
-//     | ( params.hmm0 != null ? concat(Channel.of([file(params.hmm0), 'loh'])) : Channel.empty() )
-    // | combine(type_ch, by: 0)
-
-// genelist_ch = Channel.empty()
-//     | ( params.genelist != null ? concat(Channel.of(file(params.genelist))) : Channel.empty() )
-//     | splitCsv(header: true)
-//     | map { row -> [ row.cohort, row.gene ] }
-
-// format_ch   = Channel.of(params.format.split(','))
-// features_ch = Channel.from([
-//         ['refgene', params.refgene],
-//         ['refexon', params.refexon],
-//         ['anno', params.anno]
-//     ])
-//     | filter { it[1] != null }
-//     | map { [it[0], file(it[1])] }
-
 workflow {
     ref   = prepare_references(params.snplist, params.dbsnp, params.gc)
     input = prepare_signal(signal_ch, ref.pfb, ref.gcm, pedigree_ch)
-    alt = call_alternates(input.signal, input.genotypes, ref.pfb)
-    cleaned = clean_calls(alt, ref.pfb, cohort_size)
-    tested = test_calls(input.signal, alt, cleaned.consensus, pedigree_ch, ref.pfb)
+    alt = call_alternates(input.signal, ref.pfb)
+    cleaned = clean_calls(alt.calls, ref.pfb, cohort_size)
+    tested = test_calls(input.signal, input.genotypes, alt.calls, cleaned.consensus, pedigree_ch, ref.pfb)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal)
 }

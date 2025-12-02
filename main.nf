@@ -25,9 +25,9 @@ pedigree_ch = Channel.fromPath(params.cohorts)
 
 workflow {
     ref   = prepare_references(params.snplist, params.dbsnp, params.gc)
-    input = prepare_signal(signal_ch, ref.pfb, ref.gcm, pedigree_ch)
+    input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
     alt = call_alternates(input.signal, ref.pfb)
     cleaned = clean_calls(alt.calls, ref.pfb, cohort_size)
-    tested = test_calls(input.signal, input.genotypes, alt.calls, cleaned.consensus, pedigree_ch, ref.pfb)
+    tested = test_calls(input.signal, alt.genotypes, alt.calls, cleaned.consensus, pedigree_ch, ref.pfb)
     visualize_cnv(cleaned.calls, ref.pfb, input.signal)
 }

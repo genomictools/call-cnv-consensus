@@ -1,12 +1,15 @@
 {
     "dbsnp"   : "/data/reference-data/iGenomes/Homo_sapiens/GATK/GRCh38/Annotation/GATKBundle/*_146.hg38.vcf.gz{,.tbi}",
+    "fasta"   : "input/Homo_sapiens_assembly38.fasta",
     "hmm"     : "input/hhall_0.hmm",
     "gc"      : "input/hg38.gc5base.txt",
     "snplist" : "input/snp_list.txt",
+    "known_sites" : "input/known_sites.txt",
     "genelist": "input/genelist.txt",
     "bandlist": "input/bandlist.txt",
     "refgene" : "input/hg38.refgene.txt",
     "anno"    : "input/hg38.cytoBand.txt",
+    "intervals" : "input/intervals.bed",
     "exclude_regions" : "input/hg38.exclude.txt",
     "quant_ratios" : "input/quantisnp.levels.dat",
     "quant_params" : "input/quantisnp.params.dat"

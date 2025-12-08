@@ -24,7 +24,7 @@ pedigree_ch = Channel.fromPath(params.cohorts)
     | unique
 
 workflow {
-    ref   = prepare_references(params.snplist, params.dbsnp, params.gc)
+    ref   = prepare_references(params.snplist, params.known_sites, params.dbsnp, params.gc)
     input = prepare_signal(signal_ch, ref.pfb, ref.gcm)
     alt = call_alternates(input.signal, ref.pfb)
     cleaned = clean_calls(alt.calls, ref.pfb, cohort_size)

@@ -24,7 +24,7 @@ cd tests/
 # nextflow run houlstonlab/call-cnv-consensus -r main \
 nextflow run ../main.nf \
     --output_dir ./results/ \
-    -profile local,test \
+    -profile cluster,test \
     -params-file ../test-params.json \
     -resume
 
